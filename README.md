@@ -18,4 +18,9 @@ If you are developing a production application, we recommend using TypeScript wi
 cd my-app
 npm install
 npm run dev
+
+BE:
+cd server
 node index.js - to start backend
+
+npm install react-leaflet leaflet - for map visualization
