@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 
-export function useBalloonData() {
+export function useBalloonData(hour = "00") {
   const [balloons, setBalloons] = useState([]);
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("http://localhost:3000/api/balloons");
+      const res = await fetch(`/api/balloons?hr=${hour}`);
       const json = await res.json();
       setBalloons(json.data);
     }
 
     load();
-  }, []);
+  }, [hour]);
 
   return balloons;
 }

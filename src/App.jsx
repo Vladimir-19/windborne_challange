@@ -44,51 +44,32 @@ function App() {
     console.log(data);
   }
 
-  const balloons = useBalloonData();
-  // export function validateRecord([lat, lon, alt]) {
-  //   if (
-  //     typeof lat !== "number" ||
-  //     typeof lon !== "number" ||
-  //     typeof alt !== "number"
-  //   )
-  //     return false;
+  const [hour, setHour] = useState("00");
+  const balloons = useBalloonData(hour);
 
-  //   const validLat = lat >= -90 && lat <= 90;
-  //   const validLon = lon >= -180 && lon <= 180;
-  //   const validAlt = alt >= 0 && alt <= 45000; // depends on your mission
-
-  //   return validLat && validLon && validAlt;
-  // }
-
-  // export function cleanData(records) {
-  //   return records.filter(
-  //     (r) => Array.isArray(r) && r.length === 3 && validateRecord(r)
-  //   );
-  // }
+  const hourOptions = Array.from({ length: 24 }, (_, i) => {
+    if (i === 0) return { value: "00", label: "Now" };
+    return { value: i.toString().padStart(2, "0"), label: `${i} hr ago` };
+  });
 
   return (
-    // <div>
-    //   <button onClick={submitApplication}>Submit Application</button>
-    // </div>
-    // <MapContainer center={[0, 0]} zoom={2} style={{ height: "100vh" }}>
-    //   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-    //   {balloons.map(([lat, lon], idx) => (
-    //     <Marker key={idx} position={[lat, lon]} />
-    //   ))}
-    // </MapContainer>
-    // <div>{balloons}</div>
-    // <MapContainer center={[0, 0]} zoom={2} style={{ height: "100vh" }}>
-    //   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-    //   {balloons.map((b, i) => (
-    //     <Marker key={i} position={[b.lat, b.lon]} />
-    //   ))}
-    // </MapContainer>
     <div style={{ width: "100vw", height: "100vh" }}>
+      <select
+        value={hour}
+        onChange={(e) => setHour(e.target.value)}
+        style={{ margin: "10px", padding: "6px", fontSize: "16px" }}
+      >
+        {hourOptions.map(({ value, label }) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
+
       <MapContainer
         center={[0, 0]}
         zoom={2}
-        minZoom={1} // 👈 user cannot zoom out past world view
+        minZoom={1}
         maxZoom={10}
         style={{ width: "90%", height: "80%" }}
       >
