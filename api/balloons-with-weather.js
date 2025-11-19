@@ -1,4 +1,4 @@
-const axios = require("axios");
+import axios from "axios";
 
 // In-memory weather cache
 const weatherCache = new Map();
@@ -22,7 +22,7 @@ function validateRecord(record) {
   );
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const hr = req.query.hr || "00";
     const url = `https://a.windbornesystems.com/treasure/${hr}.json`;
@@ -89,4 +89,4 @@ module.exports = async (req, res) => {
     console.error("Weather balloon route error:", err);
     res.status(500).json({ error: "Failed to fetch data with weather" });
   }
-};
+}
