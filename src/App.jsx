@@ -139,7 +139,7 @@ function App() {
           showWeather={showWeather}
         />
       </div>
-      <button
+      {/* <button
         onClick={handleSubmit}
         style={{
           padding: "10px 20px",
@@ -152,7 +152,7 @@ function App() {
         }}
       >
         Submit Application
-      </button>
+      </button> */}
     </div>
   );
 }
