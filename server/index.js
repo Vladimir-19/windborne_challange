@@ -105,4 +105,61 @@ app.get("/api/balloons/history", async (req, res) => {
   }
 });
 
+const weatherCache = new Map();
+const CACHE_DURATION = 10 * 60 * 1000;
+
+app.get("/api/balloons-with-weather", async (req, res) => {
+  try {
+    const hr = req.query.hr || "00";
+
+    const url = `https://a.windbornesystems.com/treasure/${hr}.json`;
+    const response = await axios.get(url);
+    const cleanedData = response.data.filter(validateRecord);
+
+    const results = await Promise.all(
+      cleanedData.map(async ([lat, lon, alt]) => {
+        const key = `${lat},${lon}`;
+        const cache = weatherCache.get(key);
+
+        // Cache hit
+        if (cache && Date.now() - cache.timestamp < CACHE_DURATION) {
+          return { lat, lon, alt, weather: cache.data };
+        }
+
+        // Request weather
+        try {
+          const weatherRes = await axios.get(
+            "https://api.open-meteo.com/v1/forecast",
+            {
+              params: {
+                latitude: lat,
+                longitude: lon,
+                current_weather: true,
+              },
+            }
+          );
+
+          const weather = weatherRes.data.current_weather || null;
+
+          // Save to cache
+          weatherCache.set(key, {
+            timestamp: Date.now(),
+            data: weather,
+          });
+
+          return { lat, lon, alt, weather };
+        } catch (err) {
+          console.error("Weather error:", err);
+          return { lat, lon, alt, weather: null };
+        }
+      })
+    );
+
+    res.json({ hr, data: results });
+  } catch (err) {
+    console.error("Weather balloon route error:", err);
+    res.status(500).json({ error: "Failed to fetch data with weather" });
+  }
+});
+
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
