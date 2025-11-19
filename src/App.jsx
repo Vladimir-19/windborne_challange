@@ -53,6 +53,22 @@ function App() {
     fetchWeatherBalloons();
   }, [hour, showWeather]);
 
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch("/api/submitApplication", { method: "POST" });
+      const json = await res.json();
+      console.log("Server response:", json, "also", res);
+      alert(
+        json.success
+          ? "Application submitted successfully!"
+          : `Submission failed: ${json.error}`
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Submission failed due to network error.");
+    }
+  };
+
   return (
     <div
       style={{
@@ -123,6 +139,20 @@ function App() {
           showWeather={showWeather}
         />
       </div>
+      <button
+        onClick={handleSubmit}
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          borderRadius: 6,
+          border: "none",
+          cursor: "pointer",
+          backgroundColor: "#007bff",
+          color: "#fff",
+        }}
+      >
+        Submit Application
+      </button>
     </div>
   );
 }
