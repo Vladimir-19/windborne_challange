@@ -26,7 +26,14 @@ export function MapView({ balloons, showWeather }) {
     <MapContainer
       center={[0, 0]}
       zoom={2}
-      style={{ width: "90%", height: "85%" }}
+      minZoom={1}
+      maxZoom={18}
+      maxBounds={[
+        [-90, -180],
+        [90, 180],
+      ]}
+      maxBoundsViscosity={1.0}
+      style={{ width: "100%", height: "100%" }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 

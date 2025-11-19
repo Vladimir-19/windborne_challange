@@ -8,7 +8,12 @@ export function HourSelect({ hour, setHour }) {
     <select
       value={hour}
       onChange={(e) => setHour(e.target.value)}
-      style={{ margin: "10px", padding: "6px", fontSize: "16px" }}
+      style={{
+        margin: "10px",
+        padding: "6px",
+        fontSize: "16px",
+        borderRadius: 12,
+      }}
     >
       {hourOptions.map(({ value, label }) => (
         <option key={value} value={value}>

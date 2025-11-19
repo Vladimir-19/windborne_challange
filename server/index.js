@@ -150,12 +150,31 @@ app.get("/api/balloons-with-weather", async (req, res) => {
           return { lat, lon, alt, weather };
         } catch (err) {
           console.error("Weather error:", err);
-          return { lat, lon, alt, weather: null };
+          // Detect API limit error
+          const isLimit =
+            err?.response?.data?.error ||
+            err?.response?.data?.reason ||
+            err.response?.status === 429;
+          return {
+            lat,
+            lon,
+            alt,
+            weather: null,
+            error: isLimit
+              ? "Daily API request limit exceeded"
+              : "Weather unavailable",
+          };
         }
       })
     );
 
-    res.json({ hr, data: results });
+    // res.json({ hr, data: results });
+    const anyErrors = results.some((r) => r.error);
+    res.json({
+      hr,
+      data: results,
+      error: anyErrors ? "Some weather data could not be loaded" : null,
+    });
   } catch (err) {
     console.error("Weather balloon route error:", err);
     res.status(500).json({ error: "Failed to fetch data with weather" });

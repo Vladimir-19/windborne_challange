@@ -24,3 +24,8 @@ cd server
 node index.js - to start backend
 
 npm install react-leaflet leaflet - for map visualization
+
+weather caching Uses Open-Meteo API
+
+Example call per balloon:
+https://api.open-meteo.com/v1/forecast?latitude=LAT&longitude=LON&current_weather=true
