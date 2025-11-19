@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { useBalloonData } from "./hooks/useBalloonData";
-import { useWeatherBalloonData } from "./hooks/useWeatherBalloonData";
+import { useState, useEffect } from "react";
 import { HourSelect } from "./components/HourSelect";
 import { MapView } from "./components/MapView";
 
@@ -8,15 +6,52 @@ function App() {
   const [hour, setHour] = useState("00");
   const [showWeather, setShowWeather] = useState(false);
 
-  // raw balloons (always loaded)
-  const balloons = useBalloonData(hour);
+  // raw balloons
+  const [balloons, setBalloons] = useState([]);
+  // weather balloons
+  const [weatherBalloons, setWeatherBalloons] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState(null);
 
-  // weather balloons (only load when toggled)
-  const {
-    balloons: weatherBalloons,
-    loading,
-    error: weatherError,
-  } = useWeatherBalloonData(hour, showWeather);
+  // Load raw balloons whenever hour changes
+  useEffect(() => {
+    async function fetchBalloons() {
+      try {
+        const res = await fetch(`/api/balloons?hr=${hour}`);
+        const data = await res.json();
+        setBalloons(data.data || []);
+      } catch (err) {
+        console.error("Failed to load balloons", err);
+        setBalloons([]);
+      }
+    }
+    fetchBalloons();
+  }, [hour]);
+
+  // Load weather balloons when toggled ON
+  useEffect(() => {
+    if (!showWeather) return;
+
+    async function fetchWeatherBalloons() {
+      setLoading(true);
+      setWeatherError(null);
+      try {
+        const res = await fetch(`/api/balloons-with-weather?hr=${hour}`);
+        const data = await res.json();
+
+        if (data.error) setWeatherError(data.error);
+        setWeatherBalloons(data.data || []);
+      } catch (err) {
+        console.error("Failed to load weather balloons", err);
+        setWeatherError("Failed to load weather data");
+        setWeatherBalloons([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchWeatherBalloons();
+  }, [hour, showWeather]);
 
   return (
     <div
@@ -83,7 +118,10 @@ function App() {
           boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
         }}
       >
-        <MapView balloons={showWeather ? weatherBalloons : balloons} />
+        <MapView
+          balloons={showWeather ? weatherBalloons : balloons}
+          showWeather={showWeather}
+        />
       </div>
     </div>
   );
